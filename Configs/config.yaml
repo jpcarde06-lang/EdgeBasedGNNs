@@ -1,0 +1,11 @@
+{
+  "DATA_PATH": "./Data/Datasets",
+  "SPLITS_PATH": "./Data/Splits",
+  "RESULTS_PATH": "./Results",
+  "TESTS_PATH": "./Tests",
+  "LOCAL_TRACKING_PATH": "./Tracking", 
+  
+  # Which tracker to use: Local, WandB, None
+  "tracker": "WandB",
+  "project": "EdgeBasedGNNs"
+}

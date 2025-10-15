@@ -1,0 +1,13 @@
+{
+  batch_size: {'values': [64, 1024]}, 
+  model: {'value': 'EBGNN'}, 
+  scheduler: {'value': 'Cosine'}, 
+  epochs: {'value': 500}, 
+  ff: {'value': 1}, 
+  residual: {'value': 1}, 
+  tracking: {'value': 1}, 
+  emb_dim: {'values': [256]}, 
+  drop_out: {'values': [0]}, 
+  num_mp_layers: {'values': [4]}, 
+  pooling: {'values': ['sum', 'nodesum']}
+}

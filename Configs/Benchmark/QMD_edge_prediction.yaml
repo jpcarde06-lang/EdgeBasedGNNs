@@ -1,0 +1,35 @@
+{
+  batch_size: {
+    'value': 1024
+  }, 
+  model: {
+    'value': "EBGNN"
+  },
+  scheduler: {
+    'value': "Cosine"
+  },
+  epochs: {
+    'value': 500
+  },
+  ff: {
+    'value': 1
+  },
+  residual: {
+    'value': 1
+  },
+  emb_dim: {
+    'values': [128, 256]
+  },
+  drop_out: {
+    'values': [0, 0.2, 0.5]
+  },
+  tracking: {
+    'value': 1
+  },
+  parallel_prediction: {
+    'values': [0,1]
+  },
+  num_mp_layers: {
+    'values': [3, 4, 5]
+  }
+}

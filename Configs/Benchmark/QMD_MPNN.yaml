@@ -1,0 +1,29 @@
+{
+  batch_size: {
+    'value': 1024
+  }, 
+  model: {
+    'value': "GIN"
+  },
+  scheduler: {
+    'value': "Cosine"
+  },
+  epochs: {
+    'value': 500
+  },
+  emb_dim: {
+    'values': [128, 256]
+  },
+  drop_out: {
+    'values': [0, 0.2, 0.5]
+  },
+  tracking: {
+    'value': 1
+  },
+  num_mp_layers: {
+    'values': [3, 4, 5]
+  },
+  pooling: {
+    'values': ["sum", "mean"]
+  }
+}
