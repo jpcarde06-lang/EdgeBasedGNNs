@@ -57,7 +57,7 @@ def add_model_arguments(parser, model):
     parser.add_argument('--activation', type=str, default="relu",
                         help='Activation function (default: relu; other options: elu, id, sigmoid, tanh)')
     
-    if model in ["GCN", "GIN", "GAT", "EBGNN"] or "GSN" in model:
+    if model in ["GCN", "GIN", "GAT", "EBGNN", "NCGNN"] or "GSN" in model:
         parser.add_argument('--attach_cycles', type=int, default=0,
                         help='Attach sugraph cycle counts (default: 0) ')
         

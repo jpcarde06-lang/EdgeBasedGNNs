@@ -18,6 +18,7 @@ from Models.EBGNN import EBGNN
 from Models.encoder import NodeEncoder, EdgeEncoder, VOCNodeEncoder, VOCEdgeEncoder
 from Models.mlp import MLP
 from Models.utils import get_activation
+from Models.NCGNN import NCGNN, NCGNNTransform
 from Misc.drop_features import DropFeatures
 from Misc.add_zero_edge_attr import AddZeroEdgeAttr
 from Misc.pad_node_attr import PadNodeAttr
@@ -75,9 +76,12 @@ def get_transform(args):
     if dataset_name_lowercase == "malnettiny":
         transforms += [OneHotEncodeTarget(5), LocalDegreeProfile(), AddZeroEdgeAttr(args.emb_dim)]
 
-    if args.model == "EBGNN":
+    if args.model in ["EBGNN"]:
         transforms.append(EBGNNTransform())
         # transforms.append(FastEdgeGNN())
+
+    if args.model in ["NCGNN"]:
+        transforms.append(NCGNNTransform())
     
     if args.model in ["DSS", "DS"]:
         esan_transform = policy2transform(args.policy, args.num_hops)
@@ -86,8 +90,6 @@ def get_transform(args):
     if dataset_name_lowercase == "csl":
         transforms.append(OneHotEncodeTarget(10))
         transforms.append(OneHotDegree(5))
-        
-        
         
     if "GSN" in args.model:
         dim = int(args.model[3:])
@@ -290,6 +292,22 @@ def get_model(args, num_classes, num_vertex_features, num_tasks):
                     prediction_type=get_prediction_type(args.dataset),
                     parallel_prediction=args.parallel_prediction,
                     use_dot_product = args.use_dot_product)
+    elif model == "ncgnn":
+        return NCGNN(num_classes, 
+                    num_tasks, 
+                    args.num_mp_layers, 
+                    args.emb_dim, 
+                    gnn_type = "gin" if "gsn" in model else model, 
+                    drop_ratio = args.drop_out, 
+                    JK = args.JK, 
+                    graph_pooling = args.pooling, 
+                    edge_encoder=edge_encoder, 
+                    node_encoder=node_encoder, 
+                    num_mlp_layers = args.num_mlp_layers, 
+                    residual=args.use_residual, 
+                    activation=args.activation,
+                    prediction_type=get_prediction_type(args.dataset),
+                    parallel_prediction=args.parallel_prediction)
     elif model == "mlp":
             return MLP(num_node_level_layers = args.num_n_layers,
                        num_graph_level_layers = args.num_g_layers,

@@ -24,13 +24,16 @@ class FastEdgeGraph(Data):
         elif key == "wt_mapping":
             # wt_mapping has shape [num_mappings, 3]
             return torch.tensor([self.edge_index.size(1), self.edge_index.size(1), self.edge_index.size(1)])
+        elif key == "nc_mapping":
+            # nc_mapping has shape [num_mappings, 4] with: node_idx, node_idx, node_idx, edge_idx
+            return torch.tensor([self.num_nodes, self.num_nodes, self.num_nodes, self.edge_index.size(1)])
         else:
             return super().__inc__(key, value, store)
         
     def __cat_dim__(self, key, value, *args, **kwargs):
         if key == "edges_to_target":
             return 0
-        elif key in ["wl_mapping", "wr_mapping", 'wt_mapping', ]:
+        elif key in ["wl_mapping", "wr_mapping", 'wt_mapping', "nc_mapping"]:
             return 0  # Concatenate along dimension 0
         return super().__cat_dim__(key, value, *args, **kwargs)
     
