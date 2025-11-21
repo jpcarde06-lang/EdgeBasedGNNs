@@ -1,6 +1,6 @@
 matplotlib
 ogb
-wandb
+wandb==0.17.8
 networkx
 torchmetrics
 rdkit
