@@ -20,19 +20,14 @@ Add this directory to the python path.
 export PYTHONPATH="$PYTHONPATH:$(pwd)"
 ```
 
-Create a conda environment (this assume miniconda is installed)
+You can reproduce our environment with `envoronment.yml`or `spec-file.txt`. Note that depending on your CUDA version, you might need to adapt the version of pytorch related dependencies.
 ```
-conda create --name EBGNN
+conda env create -f environment.yml
 ```
 
 Activate environment
 ```
-conda activate EBGNN
-```
-
-Install dependencies
-```
-conda install pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 -c pytorch; conda install -c pyg pyg=2.2.0; pip install -r requirements.txt
+conda activate EB
 ```
 
 We use [Umibozu](https://github.com/ocatias/Umibozu) to automate hyperparameter tuning and model evaluation. Set up with (this requires a [Weights and Biases](https://wandb.ai) account):

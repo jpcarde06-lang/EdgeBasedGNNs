@@ -1,6 +1,0 @@
-matplotlib
-ogb
-wandb
-networkx
-torchmetrics
-rdkit
