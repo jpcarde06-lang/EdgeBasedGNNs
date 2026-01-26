@@ -58,13 +58,19 @@ class NCGNNTransform(BaseTransform):
                     edge_idx = edge_to_idx.get((neighbor1, neighbor2))
                     nc_mapping.append((node, neighbor1, neighbor2, edge_idx))
 
+        # Ensure that the tensor has the correct shape for collation
+        if nc_mapping != []:
+            nc_mapping=torch.tensor(nc_mapping, dtype=torch.long)
+        else:
+            nc_mapping = torch.empty((0, 4), dtype=torch.long) 
+
         kwargs = dict(
             y=data.y,
             x=data.x,
             edge_index=data.edge_index,
             edge_attr=data.edge_attr,
             num_nodes=data.num_nodes,
-            nc_mapping=torch.tensor(nc_mapping, dtype=torch.long),
+            nc_mapping=nc_mapping,
         )    
         
         if hasattr(data, "edges_to_target"):
@@ -137,6 +143,18 @@ class NCGNN(torch.nn.Module):
                             hidden_dim=self.emb_dim // 2, 
                             activation=self.activation, 
                             dropout_rate=drop_ratio)
+
+    def reset_parameters(self):
+        if hasattr(self.node_encoder, 'reset_parameters'):
+            self.node_encoder.reset_parameters()
+        if hasattr(self.edge_encoder, 'reset_parameters'):
+            self.edge_encoder.reset_parameters()
+
+        # Reset module lists
+        for module_list in [self.MLP1_ls, self.MLP2_ls, self.EPS_ls, self.mlp]:
+            for module in module_list:
+                if hasattr(module, 'reset_parameters'):
+                    module.reset_parameters()
 
     def forward(self, batched_data):
         x, edge_index, edge_attr, batch = batched_data.x, batched_data.edge_index, batched_data.edge_attr, batched_data.batch

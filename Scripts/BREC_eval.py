@@ -7,7 +7,7 @@ from torch_geometric.transforms import Compose
 from Models.EBGNN import EBGNN
 from Models.mpnn import MPNN
 from Misc.utils import PredictionType
-from Misc.edge2WL_trafo import EBGNNTransform
+from Misc.EBGNN_trafo import EBGNNTransform
 from Misc.add_zero_edge_attr import AddZeroEdgeAttr
 from Misc.GSN_transform import GSN_transform
 
@@ -30,7 +30,7 @@ model = EBGNN(num_classes = 2, num_tasks = 1, num_layer = 9, emb_dim = emb_dim, 
 model = model.to("cuda:0")
 
 evaluate(
-    dataset, model, device=torch.device("cuda:0"), log_path="log.txt", training_config=None
+    dataset, model, device=torch.device("cuda:0"), log_path="log_EBGNN.txt", training_config=None
 )
 
 ##########################################
@@ -50,5 +50,27 @@ model = MPNN(num_classes = 2, num_tasks = 1, num_layer = 10, emb_dim = 64,
 model = model.to("cuda:0")
 
 evaluate(
-    dataset, model, device=torch.device("cuda:0"), log_path="log.txt", training_config=None
+    dataset, model, device=torch.device("cuda:0"), log_path="log_MPNNC3.txt", training_config=None
+)
+
+##########################################
+# 
+# NCGNN
+#
+##########################################
+
+from Models.NCGNN import NCGNN, NCGNNTransform
+
+dataset = BRECDataset(transform = Compose([AddZeroEdgeAttr(edge_attr_size=64), NCGNNTransform()]))
+
+model = NCGNN(num_classes = 2, num_tasks = 1, num_layer = 10, emb_dim = 64, 
+                 gnn_type="gin", residual = False, drop_ratio = 0, JK = "last", graph_pooling = "sum",
+                 node_encoder = lambda x: torch.ones(x.shape[0], 64, device=x.device), edge_encoder= lambda x: torch.ones(x.shape[0],64, device=x.device), 
+                 num_mlp_layers = 2, activation ="relu", prediction_type = PredictionType.GRAPH_PREDICTION, parallel_prediction=False)
+
+
+model = model.to("cuda:0")
+
+evaluate(
+    dataset, model, device=torch.device("cuda:0"), log_path="log_NCGNN.txt", training_config=None
 )
