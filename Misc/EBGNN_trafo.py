@@ -8,9 +8,11 @@ Basically, we pre-compute edge adjacencies according to alpha, beta and gamma ag
 from collections import defaultdict
 
 import torch
+import torch.nn.functional as F
+
 from torch_geometric.data import Data
 from torch_geometric.transforms import BaseTransform
-from torch_geometric.utils import degree
+from torch_geometric.utils import degree, is_undirected
 
 class FastEdgeGraph(Data):
     def __inc__(self, key, value, store):
@@ -65,15 +67,26 @@ class EBGNNTransform(BaseTransform):
         
         if hasattr(data, "edges_to_target"):
             kwargs["edges_to_target"] = data.edges_to_target
-        
-        return FastEdgeGraph(**kwargs)
+
+        out = FastEdgeGraph(**kwargs)
+        print(out)
+        return out
 
 def compute_triangles(edge_index, neighbors, do_test = False):
     """
     Chiba–Nishizeki algorithm for triangle counting
     runs in O(E * arboricity)
     """
-    deg = degree(edge_index[0])
+
+    # For undirected graphs, these can have different sizes
+    deg1 = degree(edge_index[0])
+    deg2 = degree(edge_index[1])
+
+    n = max(deg1.numel(), deg2.numel())
+
+    # Combine into a single deg tensor
+    # Technically this is not the correct degree but it is correct for determining whic node has higher degree
+    deg = F.pad(deg1, (0, n - deg1.numel())) + F.pad(deg2, (0, n - deg2.numel()))
     
     # Create a set of edges for O(1) lookup
     # Python  sets are implemented as hash table with on average O(1) lookup: 
@@ -100,7 +113,9 @@ def compute_triangles(edge_index, neighbors, do_test = False):
                 # Triangle found
                 triangles[(u, v)] += [neighbor]
                 triangles[(v, u)] += [neighbor]
-                
+
+    # print("#Triangles:", sum(list(map(lambda ls: len(ls), triangles.values())))/6)
+    # quit() 
     if do_test:
         print("Checking if results are correct")
         print("#Triangles:", sum(list(map(lambda ls: len(ls), triangles.values())))/6)
@@ -110,15 +125,29 @@ def compute_triangles(edge_index, neighbors, do_test = False):
         
     return triangles
     
+def edge_idx_lookup_with_rerouting_for_directed_graphs(idx, edge_idx_dict):
+    """
+    For undirect graphs, we can have the situation where a certain edge direction is not part of the graph.
+    If this edge is required for a certain operation, we instead use the other direction
+    """
+
+    u,v = idx
+    if (u,v) in edge_idx_dict:
+        return edge_idx_dict[(u, v)]
+    else:
+        return edge_idx_dict[(v, u)]
+
 def EBGNN_transform(edge_index, do_test = False):
     """
     This is designed to work purely on torch tensors, so it can be used in frameworks that do not use PyG (e.g. torchdrug)
     """
+
+    is_directed_graph = not is_undirected(edge_index)
     
     neighbors = defaultdict(set)
     for src, dst in edge_index.t().tolist():
         neighbors[int(src)].add(int(dst))
-        
+ 
     triangles = compute_triangles(edge_index, neighbors, do_test=do_test)
     
     # edge_idx_dict: maps (u, v) -> index of this edge
@@ -127,7 +156,9 @@ def EBGNN_transform(edge_index, do_test = False):
     for idx in range(edge_index.shape[1]):
         u, v = int(edge_index[0, idx]), int(edge_index[1, idx])
         edge_idx_dict[(u, v)] = idx
-        
+
+    get_edge_idx = lambda idx: edge_idx_lookup_with_rerouting_for_directed_graphs(idx, edge_idx_dict) 
+
     # [Wl] 2-Tuple: idx(u, w), idx(u, v)
     wl_mapping = []
     
@@ -145,8 +176,8 @@ def EBGNN_transform(edge_index, do_test = False):
             
         # For beta aggregations
         for w in triangles[(u,v)]:
-            wt_mapping.append([edge_idx_dict[(u, w)],
-                                edge_idx_dict[(v, w)],
+            wt_mapping.append([get_edge_idx((u, w)),
+                                get_edge_idx((v, w)),
                                 idx])
         
         if do_test:
@@ -154,12 +185,12 @@ def EBGNN_transform(edge_index, do_test = False):
         
         # For alpha aggregation:
         for w in (Nu):
-            wl_mapping.append([edge_idx_dict[(u,w)],
+            wl_mapping.append([get_edge_idx((u,w)),
                                 idx])
             
         # For gamma aggregation:
         for w in (Nv):
-            wr_mapping.append([edge_idx_dict[(v, w)],
+            wr_mapping.append([get_edge_idx((v, w)),
                                 idx])
 
                 
