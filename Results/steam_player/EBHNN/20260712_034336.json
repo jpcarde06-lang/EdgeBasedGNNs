@@ -1,0 +1,60 @@
+{
+  "dataset": "steam_player",
+  "model": "EBHNN",
+  "args": {
+    "dataset": "steam_player",
+    "model": "EBHNN",
+    "x_mode": "degree",
+    "bins": 8,
+    "seed": 42,
+    "emb_dim": 64,
+    "num_layers": 2,
+    "device": "auto",
+    "folds": 5,
+    "debug_one_fold": false
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "best_test_acc": 0.6926829218864441,
+      "best_epoch": 80,
+      "f1_micro": 0.6926829268292682,
+      "f1_macro": 0.6926829268292682,
+      "epochs_run": 131
+    },
+    {
+      "fold": 1,
+      "best_test_acc": 0.6951219439506531,
+      "best_epoch": 52,
+      "f1_micro": 0.6951219512195121,
+      "f1_macro": 0.6945968977003891,
+      "epochs_run": 103
+    },
+    {
+      "fold": 2,
+      "best_test_acc": 0.6682927012443542,
+      "best_epoch": 50,
+      "f1_micro": 0.6682926829268293,
+      "f1_macro": 0.6677867543671505,
+      "epochs_run": 101
+    },
+    {
+      "fold": 3,
+      "best_test_acc": 0.7017114758491516,
+      "best_epoch": 146,
+      "f1_micro": 0.7017114914425427,
+      "f1_macro": 0.6992502049279136,
+      "epochs_run": 197
+    },
+    {
+      "fold": 4,
+      "best_test_acc": 0.7017114758491516,
+      "best_epoch": 259,
+      "f1_micro": 0.7017114914425427,
+      "f1_macro": 0.6973677826297914,
+      "epochs_run": 310
+    }
+  ],
+  "mean_test_acc": 0.6919041037559509,
+  "std_test_acc": 0.012335546007474843
+}
