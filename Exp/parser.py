@@ -57,7 +57,7 @@ def add_model_arguments(parser, model):
     parser.add_argument('--activation', type=str, default="relu",
                         help='Activation function (default: relu; other options: elu, id, sigmoid, tanh)')
     
-    if model in ["GCN", "GIN", "GAT", "EBGNN", "NCGNN"] or "GSN" in model:
+    if model in ["GCN", "GIN", "GAT", "EBGNN", "EBHNN", "NCGNN"] or "GSN" in model:
         parser.add_argument('--attach_cycles', type=int, default=0,
                         help='Attach sugraph cycle counts (default: 0) ')
         
@@ -76,7 +76,7 @@ def add_model_arguments(parser, model):
         parser.add_argument('--parallel_prediction', type=int, default=1,
                 help='(For edge prediction tasks) 1... make predictions in parallel for each direction and report mean prediction (default: 1)')
         
-        if model  == "EBGNN":
+        if model in ["EBGNN", "EBHNN"]:
             parser.add_argument('--dot_product', type=int, default=0,
                             help='Whether to use the point-wise product in the t aggregation (1) or to simply concat the vectors (0) (default: 0)')
         

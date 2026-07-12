@@ -1,6 +1,7 @@
 {
   "DATA_PATH": "./Data/Datasets",
   "SPLITS_PATH": "./Data/Splits",
+  "KGWL_DATA_PATH": "./Data/kgwl/hypergraph",
   "RESULTS_PATH": "./Results",
   "TESTS_PATH": "./Tests",
   "LOCAL_TRACKING_PATH": "./Tracking", 

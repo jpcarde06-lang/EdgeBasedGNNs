@@ -15,7 +15,7 @@ import torch.nn as nn
 
 from Models.mpnn import MPNN, get_mp_layer
 from Models.EBGNN import EBGNN
-from Models.encoder import NodeEncoder, EdgeEncoder, VOCNodeEncoder, VOCEdgeEncoder
+from Models.encoder import NodeEncoder, EdgeEncoder, VOCNodeEncoder, VOCEdgeEncoder, StampEncoder
 from Models.mlp import MLP
 from Models.utils import get_activation
 from Models.NCGNN import NCGNN, NCGNNTransform
@@ -29,6 +29,7 @@ from Misc.one_hot_encode_target import OneHotEncodeTarget
 from Misc.weighted_cross_entropy_loss import weighted_cross_entropy
 from Misc.utils import PredictionType
 from Misc.EBGNN_trafo import EBGNNTransform
+from Misc.EBHNN_trafo import EBHNNTransform
 from Misc.GSN_transform import GSN_transform
 from Misc.QM_dataset import QM_Dataset, QM_task_level
 
@@ -79,6 +80,9 @@ def get_transform(args):
     if args.model in ["EBGNN"]:
         transforms.append(EBGNNTransform())
         # transforms.append(FastEdgeGNN())
+
+    if args.model in ["EBHNN"]:
+        transforms.append(EBHNNTransform())
 
     if args.model in ["NCGNN"]:
         transforms.append(NCGNNTransform())
@@ -290,6 +294,24 @@ def get_model(args, num_classes, num_vertex_features, num_tasks):
                     ff=args.use_ff,
                     activation=args.activation,
                     prediction_type=get_prediction_type(args.dataset),
+                    parallel_prediction=args.parallel_prediction,
+                    use_dot_product = args.use_dot_product)
+    elif model == "ebhnn":
+        return EBGNN(num_classes,
+                    num_tasks,
+                    args.num_mp_layers,
+                    args.emb_dim,
+                    gnn_type = model,
+                    drop_ratio = args.drop_out,
+                    JK = args.JK,
+                    graph_pooling = "sum",
+                    edge_encoder=StampEncoder(args.emb_dim, num_size_bins=8),
+                    node_encoder=torch.nn.Linear(1, args.emb_dim),
+                    num_mlp_layers = args.num_mlp_layers,
+                    residual=args.use_residual,
+                    ff=args.use_ff,
+                    activation=args.activation,
+                    prediction_type=PredictionType.GRAPH_PREDICTION,
                     parallel_prediction=args.parallel_prediction,
                     use_dot_product = args.use_dot_product)
     elif model == "ncgnn":
