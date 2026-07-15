@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import time
+import gc
 from datetime import datetime
 
 import numpy as np
@@ -168,7 +169,7 @@ def run_fold(args, dataset, train_idx, test_idx, device, num_classes, fold_idx):
         epoch += 1
 
     print(f"[fold {fold_idx}] best_test_acc={best_test_acc:.4f} at epoch {best_epoch} (ran {epoch} epochs)")
-    return {
+    results = {
         "fold": fold_idx,
         "best_test_acc": best_test_acc,
         "best_epoch": best_epoch,
@@ -176,7 +177,11 @@ def run_fold(args, dataset, train_idx, test_idx, device, num_classes, fold_idx):
         "f1_macro": best_f1_macro,
         "epochs_run": epoch,
     }
+    del model, optimizer, train_loader, test_loader
+    gc.collect()
+    torch.cuda.empty_cache()
 
+    return results
 
 def main():
     args = parse_args()
