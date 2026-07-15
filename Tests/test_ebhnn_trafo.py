@@ -1,7 +1,5 @@
 """
-Tests for EB-HNN's degeneration to EB-GNN, its stamp semantics, and batching.
-
-See Misc/EBHNN_trafo.py and Misc/EBGNN_trafo.py for the transforms under test.
+Tests for EB-HNN's degeneration to EB-GNN
 """
 
 import torch
@@ -38,13 +36,6 @@ def rows_as_set(tensor):
 
 
 class _CompatEBHNNTransform(EBHNNTransform):
-    """
-    PyG-version compat shim: newer torch_geometric makes BaseTransform an ABC
-    requiring `forward`, which EBHNNTransform (written for older PyG) doesn't
-    define, so it can't even be instantiated. EBHNNTransform overrides
-    `__call__` directly, so it takes precedence over BaseTransform's in the
-    MRO and this stub `forward` is never actually invoked.
-    """
 
     def forward(self, data):  # pragma: no cover - dead code, see class docstring
         raise NotImplementedError

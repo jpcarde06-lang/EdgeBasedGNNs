@@ -5,7 +5,7 @@ import torch
 from torch_geometric.data import Data
 from torch_geometric.transforms import BaseTransform
 
-DEFAULT_NUM_SIZE = 8
+DEFAULT_NUM_SIZE_BINS = 8
 MIN_HYPEREDGE_SIZE = 2  # smallest hyperedge 
 
 
@@ -52,7 +52,7 @@ def build_comembership(hyperedge_index):
     return members, hyperedges_of, neighbors
 
 
-def EBHNN_transform(hyperedge_index, num_size=DEFAULT_NUM_SIZE, do_test=False):
+def EBHNN_transform(hyperedge_index, num_size_bins=DEFAULT_NUM_SIZE_BINS, do_test=False):
    
     device = hyperedge_index.device
     members, hyperedges_of, neighbors = build_comembership(hyperedge_index)
@@ -111,11 +111,11 @@ def EBHNN_transform(hyperedge_index, num_size=DEFAULT_NUM_SIZE, do_test=False):
 
     # Size: for each pair (u, v), histogram the sizes of the
     # hyperedges that contain both u and v.
-    co_member_size = torch.zeros((P, num_size), dtype=torch.float)
+    co_member_size = torch.zeros((P, num_size_bins), dtype=torch.float)
     for (u, v), p in pair_idx.items():
         for e in (hyperedges_of[u] & hyperedges_of[v]):
             size = len(members[e])
-            b = min(max(size - MIN_HYPEREDGE_SIZE, 0), num_size - 1)
+            b = min(max(size - MIN_HYPEREDGE_SIZE, 0), num_size_bins - 1)
             co_member_size[p, b] += 1.0
 
     pair_batch = torch.zeros(P, dtype=torch.long)
@@ -132,12 +132,12 @@ def EBHNN_transform(hyperedge_index, num_size=DEFAULT_NUM_SIZE, do_test=False):
 
 class EBHNNTransform(BaseTransform):
 
-    def __init__(self, num_size=DEFAULT_NUM_SIZE):
-        self.num_size = num_size
+    def __init__(self, num_size_bins=DEFAULT_NUM_SIZE_BINS):
+        self.num_size_bins = num_size_bins
 
     def __call__(self, data: Data):
         co_member_pairs, wl_tensor, wr_tensor, wt_tensor, co_member_size, pair_batch = EBHNN_transform(
-            data.hyperedge_index, num_size=self.num_size
+            data.hyperedge_index, num_size_bins=self.num_size_bins
         )
 
         kwargs = dict(

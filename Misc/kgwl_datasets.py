@@ -1,14 +1,6 @@
 """
 Loader for the k-GWL graph-classification hypergraph benchmarks (STEAM,
-TWITTER, IMDB variants).
-
-File format (see Data/data/hypergraph/<DATASET>/*.txt):
-    line 1: N = number of hypergraphs
-    per hypergraph:
-        header line: "num_v num_e label"
-        one line of num_v vertex-label tokens (unused for features; only
-        parsed to advance the reader)
-        num_e lines, each the space-separated vertex ids of one hyperedge
+TWITTER, IMDB).
 """
 
 import os
@@ -144,8 +136,7 @@ def _build_clique_data(record, x_mode):
 
 class KGWLGraphClassificationDataset(InMemoryDataset):
     """
-    Graph-classification dataset built from a k-GWL hypergraph benchmark txt
-    file (see NAME_TO_FILE for supported names).
+    Graph-classification dataset built from a k-GWL hypergraph benchmark txt file
     """
 
     def __init__(

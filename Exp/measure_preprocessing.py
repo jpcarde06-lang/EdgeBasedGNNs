@@ -1,15 +1,3 @@
-"""
-Measures cold-cache preprocessing time for KGWLGraphClassificationDataset
-with variant='hypergraph', x_mode='ones', pre_transform=EBHNNTransform().
-
-For each dataset, the existing processed cache is deleted first so the
-timing reflects a fresh Data-list build + EBHNN transform + collate, not a
-cached torch.load.
-
-Run from EdgeBasedGNNs/ with:
-    PYTHONPATH=. python Exp/measure_preprocessing.py
-"""
-
 import glob
 import json
 import os
@@ -26,13 +14,6 @@ RESULTS_PATH = "Results/preprocessing_times.json"
 
 
 class _CompatEBHNNTransform(EBHNNTransform):
-    """
-    PyG-version compat shim: newer torch_geometric makes BaseTransform an ABC
-    requiring `forward`, which EBHNNTransform (written for older PyG) doesn't
-    define. EBHNNTransform overrides `__call__` directly, so it takes
-    precedence over BaseTransform's in the MRO and this stub is never called.
-    See Tests/test_ebhnn_trafo.py for the original pattern.
-    """
 
     def forward(self, data):  # pragma: no cover - dead code, see class docstring
         raise NotImplementedError

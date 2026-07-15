@@ -93,19 +93,6 @@ class VOCEdgeEncoder(torch.nn.Module):
 
 
 class StampEncoder(torch.nn.Module):
-    """
-    Encoder for the EB-HNN size stamp.
-
-    Each active pair (u, v) carries a histogram over the sizes of the
-    hyperedges that contain both u and v (see Misc/EBHNN_trafo.py). This
-    encoder maps that histogram to an emb_dim initialization, so it can be
-    plugged into the reused EB-GNN layer as its `edge_encoder`: the layer adds
-    edge_encoder(edge_attr) to the pair's node-derived features.
-
-    On a 2-uniform hypergraph every common hyperedge has size 2, so the
-    histogram is constant across pairs and this contributes a constant bias,
-    leaving the layer's behaviour identical to EB-GNN.
-    """
 
     def __init__(self, emb_dim, num_size_bins=8):
         super(StampEncoder, self).__init__()

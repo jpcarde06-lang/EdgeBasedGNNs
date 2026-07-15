@@ -1,7 +1,5 @@
 """
-k-GWL benchmark training script (see Docs/protocols.md for the protocol this
-mirrors: 5-fold KFold, batch_size=4, Adam lr=1e-3, StepLR(50, 0.5), early
-stopping on best TEST accuracy with patience=50 epochs).
+k-GWL benchmark training script 
 """
 
 import argparse
@@ -26,13 +24,6 @@ from Models.encoder import StampEncoder
 
 
 class _CompatEBHNNTransform(EBHNNTransform):
-    """
-    PyG-version compat shim: newer torch_geometric makes BaseTransform an ABC
-    requiring `forward`, which EBHNNTransform (written for older PyG) doesn't
-    define. EBHNNTransform overrides `__call__` directly, so it takes
-    precedence over BaseTransform's in the MRO and this stub is never called.
-    See Tests/test_ebhnn_trafo.py for the original pattern.
-    """
 
     def forward(self, data):  # pragma: no cover - dead code, see class docstring
         raise NotImplementedError
@@ -111,11 +102,7 @@ def evaluate(model, loader, device):
 
 
 def overfit_one_batch_gate(args, dataset, device, num_classes):
-    """
-    Sanity gate run before the fold loop: a freshly initialized model must be
-    able to memorize a single small batch. If it can't, something in the
-    model/data wiring is broken and fold results would not be trustworthy.
-    """
+    
     batch = next(iter(DataLoader(dataset[:4], batch_size=4, shuffle=False))).to(device)
 
     model = build_model(args, num_classes).to(device)
