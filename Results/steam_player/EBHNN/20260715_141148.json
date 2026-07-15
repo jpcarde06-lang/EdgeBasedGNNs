@@ -1,0 +1,26 @@
+{
+  "dataset": "steam_player",
+  "model": "EBHNN",
+  "args": {
+    "dataset": "steam_player",
+    "model": "EBHNN",
+    "x_mode": "degree",
+    "bins": 8,
+    "seed": 42,
+    "emb_dim": 64,
+    "num_layers": 2,
+    "device": "auto",
+    "folds": 5,
+    "debug_one_fold": true
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "best_test_acc": 0.6975609660148621,
+      "best_epoch": 92,
+      "f1_micro": 0.697560975609756,
+      "f1_macro": 0.6974457854269323,
+      "epochs_run": 143
+    }
+  ]
+}
