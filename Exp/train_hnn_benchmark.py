@@ -45,6 +45,7 @@ def parse_args():
     parser.add_argument("--folds", type=int, default=5)
     parser.add_argument("--debug_one_fold", action="store_true",
                          help="Only run fold 0, then stop (for fast debugging/iteration)")
+    parser.add_argument("--batch_size", type=int, default=4)
     return parser.parse_args()
 
 
@@ -128,8 +129,8 @@ def overfit_one_batch_gate(args, dataset, device, num_classes):
 
 
 def run_fold(args, dataset, train_idx, test_idx, device, num_classes, fold_idx):
-    train_loader = DataLoader(dataset[train_idx], batch_size=4, shuffle=True)
-    test_loader = DataLoader(dataset[test_idx], batch_size=4, shuffle=False)
+    train_loader = DataLoader(dataset[train_idx], batch_size=args.batch_size, shuffle=True)
+    test_loader = DataLoader(dataset[test_idx], batch_size=args.batch_size, shuffle=False)
 
     model = build_model(args, num_classes).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=0.0)
