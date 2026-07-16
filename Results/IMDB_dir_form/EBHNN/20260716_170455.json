@@ -1,0 +1,62 @@
+{
+  "dataset": "IMDB_dir_form",
+  "model": "EBHNN",
+  "args": {
+    "dataset": "IMDB_dir_form",
+    "model": "EBHNN",
+    "x_mode": "degree",
+    "bins": 8,
+    "max_hyperedge_size": 50,
+    "seed": 42,
+    "emb_dim": 64,
+    "num_layers": 2,
+    "device": "auto",
+    "folds": 5,
+    "debug_one_fold": false,
+    "batch_size": 4
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "best_test_acc": 0.6042780876159668,
+      "best_epoch": 85,
+      "f1_micro": 0.6042780748663101,
+      "f1_macro": 0.5503686342329223,
+      "epochs_run": 136
+    },
+    {
+      "fold": 1,
+      "best_test_acc": 0.6791443824768066,
+      "best_epoch": 191,
+      "f1_micro": 0.679144385026738,
+      "f1_macro": 0.6235949188696134,
+      "epochs_run": 242
+    },
+    {
+      "fold": 2,
+      "best_test_acc": 0.5989304780960083,
+      "best_epoch": 17,
+      "f1_micro": 0.5989304812834224,
+      "f1_macro": 0.4429883275793231,
+      "epochs_run": 68
+    },
+    {
+      "fold": 3,
+      "best_test_acc": 0.625668466091156,
+      "best_epoch": 22,
+      "f1_micro": 0.6256684491978609,
+      "f1_macro": 0.4604213784073325,
+      "epochs_run": 73
+    },
+    {
+      "fold": 4,
+      "best_test_acc": 0.6246649026870728,
+      "best_epoch": 109,
+      "f1_micro": 0.6246648793565683,
+      "f1_macro": 0.583620846038983,
+      "epochs_run": 160
+    }
+  ],
+  "mean_test_acc": 0.6265372633934021,
+  "std_test_acc": 0.028387937657990105
+}
