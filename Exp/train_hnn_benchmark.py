@@ -39,6 +39,9 @@ def parse_args():
     parser.add_argument("--x_mode", type=str, default="degree", choices=["ones", "degree"],
                          help="Vertex feature mode (protocol default: degree_as_tag=True)")
     parser.add_argument("--bins", type=int, default=8, help="Number of hyperedge-size stamp bins")
+    parser.add_argument("--max_hyperedge_size", type=int, default=None,
+                         help="Optional cap on hyperedge size; hyperedges with more members "
+                              "than this are skipped entirely (OFF by default, no cap)")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--emb_dim", type=int, default=64)
     parser.add_argument("--num_layers", type=int, default=2)
@@ -199,7 +202,8 @@ def main():
         name=args.dataset,
         variant="hypergraph",
         x_mode=args.x_mode,
-        pre_transform=_CompatEBHNNTransform(num_size_bins=args.bins),
+        pre_transform=_CompatEBHNNTransform(num_size_bins=args.bins,
+                                             max_hyperedge_size=args.max_hyperedge_size),
     )
     num_classes = dataset.num_classes
     print(f"Loaded {args.dataset}: {len(dataset)} graphs, num_classes={num_classes}")

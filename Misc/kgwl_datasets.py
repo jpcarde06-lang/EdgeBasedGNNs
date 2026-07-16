@@ -183,7 +183,14 @@ class KGWLGraphClassificationDataset(InMemoryDataset):
     @property
     def processed_file_names(self):
         pre_transform_tag = repr(self.pre_transform).replace("\n", "") if self.pre_transform is not None else "none"
-        return [f"data_{self.name}_{self.variant}_{self.x_mode}_{pre_transform_tag}.pt"]
+        # repr() on a transform doesn't include its attributes (see
+        # BaseTransform.__repr__), so a size cap on the pre_transform would
+        # otherwise be invisible here and capped/uncapped runs would collide
+        # on the same cache file. Only tag the name when a cap is set, so
+        # the default (uncapped) cache path is unchanged.
+        max_hyperedge_size = getattr(self.pre_transform, "max_hyperedge_size", None)
+        cap_tag = f"_cap{max_hyperedge_size}" if max_hyperedge_size is not None else ""
+        return [f"data_{self.name}_{self.variant}_{self.x_mode}_{pre_transform_tag}{cap_tag}.pt"]
 
     def download(self):
         raise FileNotFoundError(

@@ -31,8 +31,8 @@ class FastHyperGraph(Data):
         return super().__cat_dim__(key, value, *args, **kwargs)
 
 
-def build_comembership(hyperedge_index):
-    
+def build_comembership(hyperedge_index, max_hyperedge_size=None):
+
     hyperedge_members = defaultdict(set)
     hyperedges_of = defaultdict(set)
     for node, edge in hyperedge_index.t().tolist():
@@ -41,6 +41,17 @@ def build_comembership(hyperedge_index):
         hyperedges_of[node].add(edge)
 
     members = {e: sorted(ns) for e, ns in hyperedge_members.items()}
+
+    if max_hyperedge_size is not None:
+        oversized = {e for e, ns in members.items() if len(ns) > max_hyperedge_size}
+        if oversized:
+            members = {e: ns for e, ns in members.items() if e not in oversized}
+            hyperedges_of = defaultdict(set, {
+                node: {e for e in edges if e not in oversized}
+                for node, edges in hyperedges_of.items()
+            })
+        print(f"build_comembership: skipped {len(oversized)} hyperedge(s) "
+              f"exceeding max_hyperedge_size={max_hyperedge_size}")
 
     neighbors = defaultdict(set)
     for ns in members.values():
@@ -52,10 +63,13 @@ def build_comembership(hyperedge_index):
     return members, hyperedges_of, neighbors
 
 
-def EBHNN_transform(hyperedge_index, num_size_bins=DEFAULT_NUM_SIZE_BINS, do_test=False):
-   
+def EBHNN_transform(hyperedge_index, num_size_bins=DEFAULT_NUM_SIZE_BINS, do_test=False,
+                     max_hyperedge_size=None):
+
     device = hyperedge_index.device
-    members, hyperedges_of, neighbors = build_comembership(hyperedge_index)
+    members, hyperedges_of, neighbors = build_comembership(
+        hyperedge_index, max_hyperedge_size=max_hyperedge_size
+    )
 
     # sorted by (u, v). Both (u, v)
     # and (v, u) exist because co-membership is symmetric.
@@ -132,12 +146,14 @@ def EBHNN_transform(hyperedge_index, num_size_bins=DEFAULT_NUM_SIZE_BINS, do_tes
 
 class EBHNNTransform(BaseTransform):
 
-    def __init__(self, num_size_bins=DEFAULT_NUM_SIZE_BINS):
+    def __init__(self, num_size_bins=DEFAULT_NUM_SIZE_BINS, max_hyperedge_size=None):
         self.num_size_bins = num_size_bins
+        self.max_hyperedge_size = max_hyperedge_size
 
     def __call__(self, data: Data):
         co_member_pairs, wl_tensor, wr_tensor, wt_tensor, co_member_size, pair_batch = EBHNN_transform(
-            data.hyperedge_index, num_size_bins=self.num_size_bins
+            data.hyperedge_index, num_size_bins=self.num_size_bins,
+            max_hyperedge_size=self.max_hyperedge_size,
         )
 
         kwargs = dict(
