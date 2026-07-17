@@ -1,0 +1,36 @@
+{
+  "dataset": "IMDB_dir_genre",
+  "model": "EBHNN",
+  "args": {
+    "dataset": "IMDB_dir_genre",
+    "model": "EBHNN",
+    "x_mode": "degree",
+    "bins": 8,
+    "max_hyperedge_size": null,
+    "seed": 42,
+    "emb_dim": 64,
+    "num_layers": 2,
+    "device": "auto",
+    "folds": 5,
+    "debug_one_fold": false,
+    "batch_size": 4
+  },
+  "folds": [
+    {
+      "fold": 0,
+      "best_test_acc": 0.7466862797737122,
+      "best_epoch": 6,
+      "f1_micro": 0.7466863033873343,
+      "f1_macro": 0.5736534783046411,
+      "epochs_run": 57
+    },
+    {
+      "fold": 1,
+      "best_test_acc": 0.7776141166687012,
+      "best_epoch": 90,
+      "f1_micro": 0.7776141384388807,
+      "f1_macro": 0.7520785758345309,
+      "epochs_run": 141
+    }
+  ]
+}
